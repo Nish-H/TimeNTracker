@@ -1,9 +1,11 @@
 # Task Tracker - Production Deployment Guide
 
+⚠️ **Railway is 30-day trial only! Check [FREE-DEPLOYMENT.md](./FREE-DEPLOYMENT.md) for always-free alternatives.**
+
 ## Architecture Overview
 - **Frontend**: Vercel (React SPA)
-- **Backend**: Railway (Node.js + Express API)
-- **Database**: Railway PostgreSQL
+- **Backend**: Railway (Node.js + Express API) - 30 day trial
+- **Database**: Railway PostgreSQL - 30 day trial
 
 ## Prerequisites
 1. Railway account (free tier available)
