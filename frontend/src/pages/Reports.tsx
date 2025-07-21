@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaDownload, FaCalendarAlt, FaChartBar, FaFileExport } from 'react-icons/fa';
-import { DailyReport, HaloExportEntry } from '@/types';
-import { reportsApi } from '@/services/api';
+import { FaDownload, FaCalendarAlt, FaChartBar, FaFileExport, FaFilter } from 'react-icons/fa';
+import { DailyReport, HaloExportEntry, TimeLog, Client, Category } from '@/types';
+import { reportsApi, clientsApi, categoriesApi } from '@/services/api';
 import toast from 'react-hot-toast';
 
 const Reports: React.FC = () => {
@@ -12,11 +12,33 @@ const Reports: React.FC = () => {
     end: new Date().toISOString().split('T')[0],
   });
   const [haloExport, setHaloExport] = useState<HaloExportEntry[]>([]);
+  const [rangeReport, setRangeReport] = useState<any>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filters, setFilters] = useState({
+    clientId: '',
+    categoryId: ''
+  });
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'daily' | 'range' | 'export'>('daily');
 
   useEffect(() => {
     loadDailyReport();
+    loadFilterOptions();
   }, [selectedDate]);
+
+  const loadFilterOptions = async () => {
+    try {
+      const [clientsResponse, categoriesResponse] = await Promise.all([
+        clientsApi.getAll(),
+        categoriesApi.getAll()
+      ]);
+      setClients(clientsResponse.data.clients);
+      setCategories(categoriesResponse.data.categories);
+    } catch (error) {
+      console.error('Failed to load filter options:', error);
+    }
+  };
 
   const loadDailyReport = async () => {
     try {
@@ -26,6 +48,23 @@ const Reports: React.FC = () => {
     } catch (error) {
       console.error('Failed to load daily report:', error);
       toast.error('Failed to load daily report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateRangeReport = async () => {
+    try {
+      setLoading(true);
+      const clientId = filters.clientId ? parseInt(filters.clientId) : undefined;
+      const categoryId = filters.categoryId ? parseInt(filters.categoryId) : undefined;
+      
+      const response = await reportsApi.getRange(dateRange.start, dateRange.end, clientId, categoryId);
+      setRangeReport(response.data);
+      toast.success('Range report generated successfully');
+    } catch (error) {
+      console.error('Failed to generate range report:', error);
+      toast.error('Failed to generate range report');
     } finally {
       setLoading(false);
     }
@@ -83,8 +122,45 @@ const Reports: React.FC = () => {
         <h1 className="page-title">Reports</h1>
       </div>
 
-      {/* Daily Report */}
-      <div className="card">
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('daily')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'daily'
+                ? 'border-blue-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+            }`}
+          >
+            Daily Report
+          </button>
+          <button
+            onClick={() => setActiveTab('range')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'range'
+                ? 'border-blue-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+            }`}
+          >
+            Date Range Report
+          </button>
+          <button
+            onClick={() => setActiveTab('export')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'export'
+                ? 'border-blue-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+            }`}
+          >
+            Halo Export
+          </button>
+        </nav>
+      </div>
+
+      {/* Daily Report Tab */}
+      {activeTab === 'daily' && (
+        <div className="card">
         <div className="card-header">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -191,9 +267,200 @@ const Reports: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
-      {/* Halo Export */}
+      {/* Date Range Report Tab */}
+      {activeTab === 'range' && (
+        <div className="card">
+          <div className="card-header">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <FaChartBar className="text-white" />
+              Date Range Report
+            </h3>
+          </div>
+          <div className="card-body">
+            {/* Date Range and Filter Controls */}
+            <div className="space-y-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="form-label">Start Date</label>
+                  <input
+                    type="date"
+                    value={dateRange.start}
+                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="form-label">End Date</label>
+                  <input
+                    type="date"
+                    value={dateRange.end}
+                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="form-label">Client Filter</label>
+                  <select
+                    value={filters.clientId}
+                    onChange={(e) => setFilters({ ...filters, clientId: e.target.value })}
+                    className="form-select"
+                  >
+                    <option value="">All Clients</option>
+                    {clients.map((client) => (
+                      <option key={client.id} value={client.id}>
+                        {client.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="form-label">Category Filter</label>
+                  <select
+                    value={filters.categoryId}
+                    onChange={(e) => setFilters({ ...filters, categoryId: e.target.value })}
+                    className="form-select"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
+              <button
+                onClick={generateRangeReport}
+                disabled={loading || !dateRange.start || !dateRange.end}
+                className="btn btn-primary flex items-center gap-2"
+              >
+                <FaFilter />
+                Generate Range Report
+              </button>
+            </div>
+
+            {/* Range Report Results */}
+            {loading && (
+              <div className="animate-pulse space-y-4">
+                <div className="h-20 bg-gray-200 rounded"></div>
+                <div className="h-40 bg-gray-200 rounded"></div>
+              </div>
+            )}
+
+            {rangeReport && !loading && (
+              <div className="space-y-6">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {rangeReport.summary?.totalHours || 0}h
+                    </div>
+                    <div className="text-sm text-blue-700">Total Hours</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">
+                      {rangeReport.summary?.entriesCount || 0}
+                    </div>
+                    <div className="text-sm text-green-700">Time Entries</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {rangeReport.summary?.tasksCount || 0}
+                    </div>
+                    <div className="text-sm text-purple-700">Tasks Worked</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {rangeReport.summary?.daysWorked || 0}
+                    </div>
+                    <div className="text-sm text-orange-700">Days Worked</div>
+                  </div>
+                </div>
+
+                {/* Daily Breakdown */}
+                {rangeReport.dailyBreakdown && Object.keys(rangeReport.dailyBreakdown).length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-white mb-3">Daily Breakdown</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full border border-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Date</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Hours</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Entries</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Tasks</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {Object.entries(rangeReport.dailyBreakdown).map(([date, data]: [string, any]) => (
+                            <tr key={date}>
+                              <td className="px-4 py-2 text-sm text-black font-medium">
+                                {new Date(date).toLocaleDateString()}
+                              </td>
+                              <td className="px-4 py-2 text-sm text-black">
+                                {data.hours}h
+                              </td>
+                              <td className="px-4 py-2 text-sm text-black">
+                                {data.entries}
+                              </td>
+                              <td className="px-4 py-2 text-sm text-black">
+                                {data.tasks}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* By Client */}
+                {rangeReport.byClient && Object.keys(rangeReport.byClient).length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-white mb-3">Time by Client</h4>
+                    <div className="space-y-2">
+                      {Object.entries(rangeReport.byClient).map(([client, data]: [string, any]) => (
+                        <div key={client} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                          <span className="font-medium">{client}</span>
+                          <div className="text-right">
+                            <div className="font-medium">{data.hours}h</div>
+                            <div className="text-sm text-gray-600">{data.entries} entries</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* By Category */}
+                {rangeReport.byCategory && Object.keys(rangeReport.byCategory).length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-white mb-3">Time by Category</h4>
+                    <div className="space-y-2">
+                      {Object.entries(rangeReport.byCategory).map(([category, data]: [string, any]) => (
+                        <div key={category} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                          <span className="font-medium">{category}</span>
+                          <div className="text-right">
+                            <div className="font-medium">{data.hours}h</div>
+                            <div className="text-sm text-gray-600">{data.entries} entries</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Halo Export Tab */}
+      {activeTab === 'export' && (
       <div className="card">
         <div className="card-header">
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -302,7 +569,7 @@ const Reports: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -207,11 +207,109 @@ router.get('/range', async (req: AuthRequest, res, next) => {
 
     const totalMinutes = timeLogs.reduce((sum, log) => sum + (log.durationMinutes || 0), 0);
 
+    // Generate detailed breakdown
+    const dailyBreakdown = {} as Record<string, { 
+      hours: number; 
+      entries: number; 
+      tasks: number;
+    }>;
+    const byCategory = {} as Record<string, { 
+      hours: number; 
+      entries: number; 
+    }>;
+    const byClient = {} as Record<string, { 
+      hours: number; 
+      entries: number; 
+    }>;
+    const byTask = {} as Record<string, { 
+      hours: number; 
+      entries: number; 
+      haloTicketId?: string 
+    }>;
+
+    const uniqueDates = new Set<string>();
+    const uniqueTasks = new Set<string>();
+
+    timeLogs.forEach(log => {
+      const minutes = log.durationMinutes || 0;
+      const hours = parseFloat((minutes / 60).toFixed(2));
+      
+      // Daily breakdown
+      const day = format(log.startTime, 'yyyy-MM-dd');
+      uniqueDates.add(day);
+      if (!dailyBreakdown[day]) {
+        dailyBreakdown[day] = { hours: 0, entries: 0, tasks: 0 };
+      }
+      dailyBreakdown[day].hours += hours;
+      dailyBreakdown[day].entries += 1;
+
+      // Category breakdown
+      const categoryName = log.task.category?.name || 'Uncategorized';
+      if (!byCategory[categoryName]) {
+        byCategory[categoryName] = { hours: 0, entries: 0 };
+      }
+      byCategory[categoryName].hours += hours;
+      byCategory[categoryName].entries += 1;
+
+      // Client breakdown
+      const clientName = log.task.client?.name || 'No Client';
+      if (!byClient[clientName]) {
+        byClient[clientName] = { hours: 0, entries: 0 };
+      }
+      byClient[clientName].hours += hours;
+      byClient[clientName].entries += 1;
+
+      // Task breakdown
+      const taskTitle = log.task.title;
+      uniqueTasks.add(taskTitle);
+      if (!byTask[taskTitle]) {
+        byTask[taskTitle] = { 
+          hours: 0, 
+          entries: 0,
+          haloTicketId: log.task.haloTicketId || undefined
+        };
+      }
+      byTask[taskTitle].hours += hours;
+      byTask[taskTitle].entries += 1;
+    });
+
+    // Calculate unique tasks per day
+    Object.keys(dailyBreakdown).forEach(day => {
+      const dayTasks = new Set(
+        timeLogs
+          .filter(log => format(log.startTime, 'yyyy-MM-dd') === day)
+          .map(log => log.task.title)
+      );
+      dailyBreakdown[day].tasks = dayTasks.size;
+    });
+
+    // Round all hours to 2 decimal places
+    Object.values(dailyBreakdown).forEach(day => {
+      day.hours = parseFloat(day.hours.toFixed(2));
+    });
+    Object.values(byCategory).forEach(cat => {
+      cat.hours = parseFloat(cat.hours.toFixed(2));
+    });
+    Object.values(byClient).forEach(client => {
+      client.hours = parseFloat(client.hours.toFixed(2));
+    });
+    Object.values(byTask).forEach(task => {
+      task.hours = parseFloat(task.hours.toFixed(2));
+    });
+
     res.json({
       period: { startDate, endDate },
-      totalMinutes,
-      totalHours: parseFloat((totalMinutes / 60).toFixed(2)),
-      entriesCount: timeLogs.length,
+      summary: {
+        totalMinutes,
+        totalHours: parseFloat((totalMinutes / 60).toFixed(2)),
+        entriesCount: timeLogs.length,
+        tasksCount: uniqueTasks.size,
+        daysWorked: uniqueDates.size,
+      },
+      dailyBreakdown,
+      byCategory,
+      byClient,
+      byTask,
       timeLogs,
     });
   } catch (error) {

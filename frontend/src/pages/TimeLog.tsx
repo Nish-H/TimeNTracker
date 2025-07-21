@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaClock, FaEdit, FaTrash, FaCalendarAlt, FaPlus } from 'react-icons/fa';
+import { FaClock, FaEdit, FaTrash, FaCalendarAlt, FaPlus, FaBullseye } from 'react-icons/fa';
 import { TimeLog } from '@/types';
 import { timeLogsApi } from '@/services/api';
 import { useTimer } from '@/hooks/useTimer';
 import ManualTimeEntryModal from '@/components/ManualTimeEntryModal';
+import BulkTimeEntryModal from '@/components/BulkTimeEntryModal';
 import toast from 'react-hot-toast';
 
 const TimeLogPage: React.FC = () => {
@@ -11,6 +12,7 @@ const TimeLogPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showManualModal, setShowManualModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [editingTimeLog, setEditingTimeLog] = useState<TimeLog | null>(null);
   const { formatTime } = useTimer();
 
@@ -84,6 +86,13 @@ const TimeLogPage: React.FC = () => {
           >
             <FaPlus />
             Add Manual Entry
+          </button>
+          <button
+            onClick={() => setShowBulkModal(true)}
+            className="btn btn-secondary flex items-center gap-2"
+          >
+            <FaBullseye />
+            Bulk Time Entry
           </button>
           <div className="flex items-center gap-2">
             <FaCalendarAlt className="text-white" />
@@ -205,6 +214,12 @@ const TimeLogPage: React.FC = () => {
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
         editTimeLog={editingTimeLog}
+      />
+
+      <BulkTimeEntryModal
+        isOpen={showBulkModal}
+        onClose={() => setShowBulkModal(false)}
+        onSuccess={handleModalSuccess}
       />
     </div>
   );
