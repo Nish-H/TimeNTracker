@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { AuthResponse, Task, TimeLog, Client, Category, DailyReport, HaloExportEntry, User } from '@/types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? 'https://your-backend-url.railway.app' : 'http://localhost:5000');
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
