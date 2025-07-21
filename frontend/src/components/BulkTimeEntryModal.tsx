@@ -164,7 +164,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
           </h2>
           <button
             onClick={handleClose}
-            className="text-black hover:text-gray-800"
+            className="text-white hover:text-gray-800"
             disabled={loading}
           >
             <FaTimes />
@@ -175,7 +175,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
           <div className="p-6 space-y-6 overflow-y-auto flex-1">
             {/* Task Selection */}
             <div>
-              <label className="block text-sm font-medium text-black font-bold mb-1">
+              <label className="block text-sm font-medium text-white font-bold mb-1">
                 Task *
               </label>
               <select
@@ -215,7 +215,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                     {/* Date */}
                     <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-black mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         Date
                       </label>
                       <input
@@ -229,7 +229,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
                     {/* Start Time */}
                     <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-black mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         Start Time
                       </label>
                       <input
@@ -243,7 +243,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
                     {/* End Time */}
                     <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-black mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         End Time
                       </label>
                       <input
@@ -257,7 +257,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
                     {/* Hours Worked (Calculated) */}
                     <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-black mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         Hours
                       </label>
                       <div className="p-2 bg-gray-100 rounded text-center font-medium">
@@ -267,7 +267,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
                     {/* Description */}
                     <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-black mb-1">
+                      <label className="block text-sm font-medium text-white mb-1">
                         Description
                       </label>
                       <input
@@ -295,7 +295,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
               ))}
 
               {timeEntries.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-300">
                   <FaCalendarAlt className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <p>No time entries added yet</p>
                   <p className="text-sm">Click "Add Time Entry" to get started</p>

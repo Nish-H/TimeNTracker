@@ -147,13 +147,13 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, client, onSa
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <FaBuilding className="text-primary-600" />
-            <h2 className="text-xl font-semibold text-black font-bold">
+            <h2 className="text-xl font-semibold text-white font-bold">
               {client ? 'Edit Client' : 'Add New Client'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-black hover:text-gray-800 transition-colors"
+            className="text-white hover:text-gray-800 transition-colors"
             disabled={loading}
           >
             <FaTimes size={20} />
@@ -201,7 +201,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, client, onSa
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">{errors.description}</p>
             )}
-            <p className="mt-1 text-sm text-black font-semibold">
+            <p className="mt-1 text-sm text-white font-semibold">
               {formData.description.length}/500 characters
             </p>
           </div>

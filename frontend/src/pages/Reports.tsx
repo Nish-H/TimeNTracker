@@ -389,25 +389,25 @@ const Reports: React.FC = () => {
                       <table className="min-w-full border border-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Date</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Hours</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Entries</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-black uppercase">Tasks</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Date</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Hours</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Entries</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Tasks</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {Object.entries(rangeReport.dailyBreakdown).map(([date, data]: [string, any]) => (
                             <tr key={date}>
-                              <td className="px-4 py-2 text-sm text-black font-medium">
+                              <td className="px-4 py-2 text-sm text-white font-medium">
                                 {new Date(date).toLocaleDateString()}
                               </td>
-                              <td className="px-4 py-2 text-sm text-black">
+                              <td className="px-4 py-2 text-sm text-white">
                                 {data.hours}h
                               </td>
-                              <td className="px-4 py-2 text-sm text-black">
+                              <td className="px-4 py-2 text-sm text-white">
                                 {data.entries}
                               </td>
-                              <td className="px-4 py-2 text-sm text-black">
+                              <td className="px-4 py-2 text-sm text-white">
                                 {data.tasks}
                               </td>
                             </tr>
@@ -428,7 +428,7 @@ const Reports: React.FC = () => {
                           <span className="font-medium">{client}</span>
                           <div className="text-right">
                             <div className="font-medium">{data.hours}h</div>
-                            <div className="text-sm text-gray-600">{data.entries} entries</div>
+                            <div className="text-sm text-gray-300">{data.entries} entries</div>
                           </div>
                         </div>
                       ))}
@@ -446,7 +446,7 @@ const Reports: React.FC = () => {
                           <span className="font-medium">{category}</span>
                           <div className="text-right">
                             <div className="font-medium">{data.hours}h</div>
-                            <div className="text-sm text-gray-600">{data.entries} entries</div>
+                            <div className="text-sm text-gray-300">{data.entries} entries</div>
                           </div>
                         </div>
                       ))}

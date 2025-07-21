@@ -177,7 +177,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-medium text-black font-bold">{task.title}</h4>
+                      <h4 className="font-medium text-white font-bold">{task.title}</h4>
                       {task.haloTicketId && (
                         <div className="flex items-center gap-1 text-xs text-blue-600">
                           <FaExternalLinkAlt />
@@ -187,7 +187,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     </div>
 
                     {task.description && (
-                      <p className="text-sm text-black font-semibold mb-2">{task.description}</p>
+                      <p className="text-sm text-white font-semibold mb-2">{task.description}</p>
                     )}
 
                     <div className="flex items-center gap-2 mb-2">

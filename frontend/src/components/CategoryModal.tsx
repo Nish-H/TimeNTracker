@@ -180,13 +180,13 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ isOpen, onClose, category
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <FaTags className="text-primary-600" />
-            <h2 className="text-xl font-semibold text-black font-bold">
+            <h2 className="text-xl font-semibold text-white font-bold">
               {category ? 'Edit Category' : 'Add New Category'}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-black hover:text-gray-800 transition-colors"
+            className="text-white hover:text-gray-800 transition-colors"
             disabled={loading}
           >
             <FaTimes size={20} />
@@ -228,7 +228,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ isOpen, onClose, category
                   className="w-8 h-8 rounded-full border-2 border-gray-300"
                   style={{ backgroundColor: formData.color }}
                 ></div>
-                <span className="text-sm font-medium text-black font-bold">
+                <span className="text-sm font-medium text-white font-bold">
                   {formData.color.toUpperCase()}
                 </span>
                 <button
@@ -264,7 +264,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ isOpen, onClose, category
 
                   {/* Custom Color Input */}
                   <div>
-                    <label htmlFor="customColor" className="block text-sm font-medium text-black font-bold mb-1">
+                    <label htmlFor="customColor" className="block text-sm font-medium text-white font-bold mb-1">
                       Custom Color
                     </label>
                     <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ isOpen, onClose, category
 
           {/* Preview */}
           <div className="p-4 bg-gray-50 rounded-lg border">
-            <label className="block text-sm font-medium text-black font-bold mb-2">
+            <label className="block text-sm font-medium text-white font-bold mb-2">
               Preview
             </label>
             <div className="flex items-center gap-3 p-3 bg-white rounded border">

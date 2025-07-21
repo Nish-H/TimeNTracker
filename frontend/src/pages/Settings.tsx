@@ -348,7 +348,7 @@ const Settings: React.FC = () => {
                     <div>
                       <div className="font-medium">{client.name}</div>
                       {client.description && (
-                        <div className="text-sm text-black font-semibold">{client.description}</div>
+                        <div className="text-sm text-white font-semibold">{client.description}</div>
                       )}
                     </div>
                     <div className="flex gap-2">

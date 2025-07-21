@@ -135,7 +135,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
           </h2>
           <button
             onClick={handleClose}
-            className="text-black hover:text-gray-800"
+            className="text-white hover:text-gray-800"
             disabled={loading}
           >
             <FaTimes />
@@ -144,7 +144,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="taskId" className="block text-sm font-medium text-black font-bold mb-1">
+            <label htmlFor="taskId" className="block text-sm font-medium text-white font-bold mb-1">
               Task *
             </label>
             <select
@@ -165,7 +165,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-black font-bold mb-1">
+              <label htmlFor="startDate" className="block text-sm font-medium text-white font-bold mb-1">
                 Start Date *
               </label>
               <input
@@ -178,7 +178,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="startTime" className="block text-sm font-medium text-black font-bold mb-1">
+              <label htmlFor="startTime" className="block text-sm font-medium text-white font-bold mb-1">
                 Start Time *
               </label>
               <input
@@ -194,7 +194,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-black font-bold mb-1">
+              <label htmlFor="endDate" className="block text-sm font-medium text-white font-bold mb-1">
                 End Date *
               </label>
               <input
@@ -207,7 +207,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="endTime" className="block text-sm font-medium text-black font-bold mb-1">
+              <label htmlFor="endTime" className="block text-sm font-medium text-white font-bold mb-1">
                 End Time *
               </label>
               <input
@@ -222,7 +222,7 @@ const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-black font-bold mb-1">
+            <label htmlFor="description" className="block text-sm font-medium text-white font-bold mb-1">
               Description
             </label>
             <textarea

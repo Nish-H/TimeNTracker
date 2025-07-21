@@ -115,7 +115,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="text-black hover:text-gray-800"
+            className="text-white hover:text-gray-800"
           >
             <FaTimes />
           </button>
@@ -123,7 +123,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-black mb-1">
+            <label className="block text-sm font-bold text-white mb-1">
               Title *
             </label>
             <input
@@ -137,7 +137,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-black mb-1">
+            <label className="block text-sm font-bold text-white mb-1">
               Description
             </label>
             <textarea
@@ -150,7 +150,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-black mb-1">
+            <label className="block text-sm font-bold text-white mb-1">
               Halo Ticket ID
             </label>
             <input
@@ -164,7 +164,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-black mb-1">
+              <label className="block text-sm font-bold text-white mb-1">
                 Client
               </label>
               <select
@@ -182,7 +182,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-black mb-1">
+              <label className="block text-sm font-bold text-white mb-1">
                 Category
               </label>
               <select
@@ -202,7 +202,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-black mb-1">
+              <label className="block text-sm font-bold text-white mb-1">
                 Priority
               </label>
               <select
@@ -219,7 +219,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
             {mode === 'edit' && (
               <div>
-                <label className="block text-sm font-bold text-black mb-1">
+                <label className="block text-sm font-bold text-white mb-1">
                   Status
                 </label>
                 <select
@@ -237,7 +237,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-black mb-1">
+            <label className="block text-sm font-bold text-white mb-1">
               Due Date
             </label>
             <input

@@ -152,7 +152,7 @@ const TimeLogPage: React.FC = () => {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-medium text-black font-bold">{log.task?.title}</h4>
+                        <h4 className="font-medium text-white font-bold">{log.task?.title}</h4>
                         {log.task?.haloTicketId && (
                           <span className="status-badge bg-blue-100 text-blue-800">
                             {log.task.haloTicketId}
@@ -160,13 +160,13 @@ const TimeLogPage: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="text-sm text-black font-semibold mb-2">
+                      <div className="text-sm text-white font-semibold mb-2">
                         {new Date(log.startTime).toLocaleTimeString()} - {' '}
                         {log.endTime ? new Date(log.endTime).toLocaleTimeString() : 'Running'}
                       </div>
 
                       {log.description && (
-                        <p className="text-sm text-black font-semibold mb-2">{log.description}</p>
+                        <p className="text-sm text-white font-semibold mb-2">{log.description}</p>
                       )}
 
                       <div className="flex items-center gap-4 text-sm text-white">
@@ -181,7 +181,7 @@ const TimeLogPage: React.FC = () => {
 
                     <div className="flex items-center gap-2 ml-4">
                       <div className="text-right mr-4">
-                        <div className="font-medium text-black font-bold">
+                        <div className="font-medium text-white font-bold">
                           {log.durationMinutes ? formatTime(log.durationMinutes * 60) : 'Running'}
                         </div>
                         <div className="text-sm text-white">

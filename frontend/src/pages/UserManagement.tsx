@@ -179,7 +179,7 @@ const UserManagement: React.FC = () => {
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-black font-bold">
+                          <div className="text-sm font-medium text-white font-bold">
                             {user.name}
                           </div>
                           <div className="text-sm text-white">{user.email}</div>
@@ -348,7 +348,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-black font-semibold"
+            className="text-gray-400 hover:text-white font-semibold"
             disabled={loading}
           >
             ×
@@ -357,7 +357,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-black font-bold mb-1">
+            <label className="block text-sm font-medium text-white font-bold mb-1">
               Name *
             </label>
             <input
@@ -370,7 +370,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-black font-bold mb-1">
+            <label className="block text-sm font-medium text-white font-bold mb-1">
               Email *
             </label>
             <input
@@ -383,7 +383,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-black font-bold mb-1">
+            <label className="block text-sm font-medium text-white font-bold mb-1">
               Role
             </label>
             <select
@@ -398,7 +398,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-black font-bold mb-1">
+            <label className="block text-sm font-medium text-white font-bold mb-1">
               Password {!editUser && '*'}
             </label>
             <input
@@ -412,7 +412,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
 
           {!editUser && (
             <div>
-              <label className="block text-sm font-medium text-black font-bold mb-1">
+              <label className="block text-sm font-medium text-white font-bold mb-1">
                 Confirm Password *
               </label>
               <input
@@ -434,7 +434,7 @@ const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, onSuccess, editU
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 className="form-checkbox"
               />
-              <label htmlFor="isActive" className="ml-2 text-sm text-black font-bold">
+              <label htmlFor="isActive" className="ml-2 text-sm text-white font-bold">
                 Active User
               </label>
             </div>

@@ -179,10 +179,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-black font-bold">Edit Profile</h2>
+          <h2 className="text-xl font-semibold text-white font-bold">Edit Profile</h2>
           <button
             onClick={onClose}
-            className="text-black hover:text-gray-700 transition-colors"
+            className="text-white hover:text-gray-700 transition-colors"
           >
             <FaTimes size={20} />
           </button>
@@ -196,7 +196,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
               className={`py-3 px-6 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'profile'
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-black font-semibold hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-white font-semibold hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               Profile Info
@@ -206,7 +206,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
               className={`py-3 px-6 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === 'password'
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-black font-semibold hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-white font-semibold hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               Change Password
@@ -289,7 +289,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-700"
                   >
                     {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -316,7 +316,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-black hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-700"
                   >
                     {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>

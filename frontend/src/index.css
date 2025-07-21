@@ -118,6 +118,14 @@
     @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
   }
   
+  .form-select {
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
+  }
+  
+  .form-textarea {
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow resize-vertical;
+  }
+  
   .form-label {
     @apply block text-sm font-bold text-white mb-2;
   }
@@ -131,7 +139,7 @@
   }
   
   .card-body {
-    @apply px-6 py-6 text-black font-medium;
+    @apply px-6 py-6 text-white font-medium;
   }
   
   .timer-display {
