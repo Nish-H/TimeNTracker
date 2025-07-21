@@ -13,7 +13,8 @@ interface BulkTimeEntryModalProps {
 interface TimeEntry {
   id: string;
   date: string;
-  hours: number;
+  startTime: string;
+  endTime: string;
   description: string;
 }
 
@@ -25,11 +26,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState('');
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
-  const [defaultHours, setDefaultHours] = useState(8);
-  const [defaultStartTime, setDefaultStartTime] = useState('09:00');
 
   useEffect(() => {
     if (isOpen) {
@@ -40,12 +37,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
   const resetForm = () => {
     setSelectedTaskId('');
-    const today = new Date().toISOString().split('T')[0];
-    setStartDate(today);
-    setEndDate(today);
     setTimeEntries([]);
-    setDefaultHours(8);
-    setDefaultStartTime('09:00');
   };
 
   const loadTasks = async () => {
@@ -58,53 +50,12 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
     }
   };
 
-  const generateDateRange = () => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const entries: TimeEntry[] = [];
-
-    // Generate entries for each day in the range (excluding weekends by default)
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const dayOfWeek = d.getDay();
-      // Skip weekends (0 = Sunday, 6 = Saturday)
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        entries.push({
-          id: Math.random().toString(36).substr(2, 9),
-          date: d.toISOString().split('T')[0],
-          hours: defaultHours,
-          description: ''
-        });
-      }
-    }
-
-    setTimeEntries(entries);
-    toast.success(`Generated ${entries.length} work day entries`);
-  };
-
-  const generateAllDays = () => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const entries: TimeEntry[] = [];
-
-    // Generate entries for each day in the range (including weekends)
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      entries.push({
-        id: Math.random().toString(36).substr(2, 9),
-        date: d.toISOString().split('T')[0],
-        hours: defaultHours,
-        description: ''
-      });
-    }
-
-    setTimeEntries(entries);
-    toast.success(`Generated ${entries.length} day entries`);
-  };
-
-  const addSingleDay = () => {
+  const addTimeEntry = () => {
     const newEntry: TimeEntry = {
       id: Math.random().toString(36).substr(2, 9),
       date: new Date().toISOString().split('T')[0],
-      hours: defaultHours,
+      startTime: '09:00',
+      endTime: '17:00',
       description: ''
     };
     setTimeEntries([...timeEntries, newEntry]);
@@ -114,10 +65,22 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
     setTimeEntries(timeEntries.filter(entry => entry.id !== id));
   };
 
-  const updateEntry = (id: string, field: keyof TimeEntry, value: string | number) => {
+  const updateEntry = (id: string, field: keyof TimeEntry, value: string) => {
     setTimeEntries(timeEntries.map(entry => 
       entry.id === id ? { ...entry, [field]: value } : entry
     ));
+  };
+
+  const calculateHours = (startTime: string, endTime: string): number => {
+    if (!startTime || !endTime) return 0;
+    
+    const start = new Date(`2000-01-01T${startTime}:00`);
+    const end = new Date(`2000-01-01T${endTime}:00`);
+    
+    if (end <= start) return 0;
+    
+    const diffMs = end.getTime() - start.getTime();
+    return Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100; // Round to 2 decimal places
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,11 +98,12 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
     // Validate entries
     const invalidEntries = timeEntries.filter(entry => 
-      !entry.date || entry.hours <= 0 || entry.hours > 24
+      !entry.date || !entry.startTime || !entry.endTime || 
+      calculateHours(entry.startTime, entry.endTime) <= 0
     );
 
     if (invalidEntries.length > 0) {
-      toast.error('Please ensure all entries have valid dates and hours (1-24)');
+      toast.error('Please ensure all entries have valid dates and times');
       return;
     }
 
@@ -148,16 +112,15 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
       
       // Create time entries for each day
       const promises = timeEntries.map(entry => {
-        const startTime = new Date(`${entry.date}T${defaultStartTime}:00`);
-        const endTime = new Date(startTime);
-        endTime.setHours(startTime.getHours() + Math.floor(entry.hours));
-        endTime.setMinutes(startTime.getMinutes() + ((entry.hours % 1) * 60));
+        const startDateTime = new Date(`${entry.date}T${entry.startTime}:00`);
+        const endDateTime = new Date(`${entry.date}T${entry.endTime}:00`);
+        const hours = calculateHours(entry.startTime, entry.endTime);
 
         return timeLogsApi.createManual({
           taskId: parseInt(selectedTaskId),
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
-          description: entry.description || `Bulk entry - ${entry.hours} hours`
+          startTime: startDateTime.toISOString(),
+          endTime: endDateTime.toISOString(),
+          description: entry.description || `Bulk entry - ${hours} hours`
         });
       });
 
@@ -187,7 +150,9 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
   if (!isOpen) return null;
 
-  const totalHours = timeEntries.reduce((sum, entry) => sum + entry.hours, 0);
+  const totalHours = timeEntries.reduce((sum, entry) => 
+    sum + calculateHours(entry.startTime, entry.endTime), 0
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -228,142 +193,115 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
               </select>
             </div>
 
-            {/* Date Range Setup */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium text-black font-bold mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="form-input w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-black font-bold mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="form-input w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-black font-bold mb-1">
-                  Default Hours
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  min="0.5"
-                  max="24"
-                  value={defaultHours}
-                  onChange={(e) => setDefaultHours(parseFloat(e.target.value))}
-                  className="form-input w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-black font-bold mb-1">
-                  Start Time
-                </label>
-                <input
-                  type="time"
-                  value={defaultStartTime}
-                  onChange={(e) => setDefaultStartTime(e.target.value)}
-                  className="form-input w-full"
-                />
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 flex-wrap">
+            {/* Add Entry Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">
+                Time Entries {timeEntries.length > 0 && `(${timeEntries.length} entries, ${totalHours.toFixed(2)} hours total)`}
+              </h3>
               <button
                 type="button"
-                onClick={generateDateRange}
-                className="btn btn-secondary flex items-center gap-2"
-                disabled={!startDate || !endDate}
-              >
-                <FaCalendarAlt />
-                Generate Work Days
-              </button>
-              <button
-                type="button"
-                onClick={generateAllDays}
-                className="btn btn-secondary flex items-center gap-2"
-                disabled={!startDate || !endDate}
-              >
-                <FaCalendarAlt />
-                Generate All Days
-              </button>
-              <button
-                type="button"
-                onClick={addSingleDay}
-                className="btn btn-secondary flex items-center gap-2"
+                onClick={addTimeEntry}
+                className="btn btn-primary flex items-center gap-2"
               >
                 <FaPlus />
-                Add Single Day
+                Add Time Entry
               </button>
             </div>
 
             {/* Time Entries */}
-            {timeEntries.length > 0 && (
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">
-                    Time Entries ({timeEntries.length} days, {totalHours} hours total)
-                  </h3>
-                </div>
-                
-                <div className="max-h-60 overflow-y-auto space-y-2">
-                  {timeEntries.map((entry) => (
-                    <div key={entry.id} className="grid grid-cols-12 gap-2 items-center p-3 bg-gray-50 rounded">
-                      <div className="col-span-3">
-                        <input
-                          type="date"
-                          value={entry.date}
-                          onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
-                          className="form-input w-full text-sm"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="0.5"
-                          max="24"
-                          value={entry.hours}
-                          onChange={(e) => updateEntry(entry.id, 'hours', parseFloat(e.target.value))}
-                          className="form-input w-full text-sm"
-                          placeholder="Hours"
-                        />
-                      </div>
-                      <div className="col-span-6">
-                        <input
-                          type="text"
-                          value={entry.description}
-                          onChange={(e) => updateEntry(entry.id, 'description', e.target.value)}
-                          className="form-input w-full text-sm"
-                          placeholder="Description (optional)"
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <button
-                          type="button"
-                          onClick={() => removeEntry(entry.id)}
-                          className="btn btn-sm btn-danger"
-                        >
-                          <FaTrash />
-                        </button>
+            <div className="space-y-3">
+              {timeEntries.map((entry, index) => (
+                <div key={entry.id} className="p-4 bg-gray-50 rounded-lg border">
+                  <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                    {/* Date */}
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Date
+                      </label>
+                      <input
+                        type="date"
+                        value={entry.date}
+                        onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                        className="form-input w-full"
+                        required
+                      />
+                    </div>
+
+                    {/* Start Time */}
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Start Time
+                      </label>
+                      <input
+                        type="time"
+                        value={entry.startTime}
+                        onChange={(e) => updateEntry(entry.id, 'startTime', e.target.value)}
+                        className="form-input w-full"
+                        required
+                      />
+                    </div>
+
+                    {/* End Time */}
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        End Time
+                      </label>
+                      <input
+                        type="time"
+                        value={entry.endTime}
+                        onChange={(e) => updateEntry(entry.id, 'endTime', e.target.value)}
+                        className="form-input w-full"
+                        required
+                      />
+                    </div>
+
+                    {/* Hours Worked (Calculated) */}
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Hours
+                      </label>
+                      <div className="p-2 bg-gray-100 rounded text-center font-medium">
+                        {calculateHours(entry.startTime, entry.endTime).toFixed(2)}h
                       </div>
                     </div>
-                  ))}
+
+                    {/* Description */}
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Description
+                      </label>
+                      <input
+                        type="text"
+                        value={entry.description}
+                        onChange={(e) => updateEntry(entry.id, 'description', e.target.value)}
+                        className="form-input w-full"
+                        placeholder="Optional"
+                      />
+                    </div>
+
+                    {/* Remove Button */}
+                    <div className="md:col-span-1 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => removeEntry(entry.id)}
+                        className="btn btn-sm btn-danger flex items-center gap-1"
+                        title="Remove entry"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
+
+              {timeEntries.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <FaCalendarAlt className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <p>No time entries added yet</p>
+                  <p className="text-sm">Click "Add Time Entry" to get started</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Footer */}
