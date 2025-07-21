@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: timentracker-db
+    environment:
+      POSTGRES_USER: tasktracker
+      POSTGRES_PASSWORD: tasktracker123
+      POSTGRES_DB: task_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: timentracker-backend
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://tasktracker:tasktracker123@postgres:5432/task_tracker
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      NODE_ENV: development
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: timentracker-frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         UserRole  @default(STANDARD)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  tasks        Task[]
+  timeLogs     TimeLog[]
+  
+  @@map("users")
+}
+
+model Client {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  tasks       Task[]
+  
+  @@map("clients")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  color String @default("#6B7280")
+  
+  tasks Task[]
+  
+  @@map("categories")
+}
+
+model Task {
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String?
+  haloTicketId  String?   @map("halo_ticket_id")
+  clientId      Int?      @map("client_id")
+  categoryId    Int?      @map("category_id")
+  userId        Int       @map("user_id")
+  status        TaskStatus @default(PENDING)
+  priority      TaskPriority @default(MEDIUM)
+  dueDate       DateTime? @map("due_date")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  client        Client?   @relation(fields: [clientId], references: [id])
+  category      Category? @relation(fields: [categoryId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  timeLogs      TimeLog[]
+  
+  @@map("tasks")
+}
+
+model TimeLog {
+  id              Int       @id @default(autoincrement())
+  taskId          Int       @map("task_id")
+  userId          Int       @map("user_id")
+  startTime       DateTime  @map("start_time")
+  endTime         DateTime? @map("end_time")
+  durationMinutes Int?      @map("duration_minutes")
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  task            Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id])
+  
+  @@map("time_logs")
+}
+
+model Backup {
+  id           Int      @id @default(autoincrement())
+  filename     String
+  filepath     String
+  size         Int
+  checksum     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  verified     Boolean  @default(false)
+  
+  @@map("backups")
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum UserRole {
+  STANDARD
+  POWER
+  ADMIN
+}
