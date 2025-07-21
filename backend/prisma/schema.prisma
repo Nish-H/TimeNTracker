@@ -12,14 +12,18 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  name         String
-  role         UserRole  @default(STANDARD)
-  isActive     Boolean   @default(true) @map("is_active")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  passwordHash      String    @map("password_hash")
+  name              String
+  role              UserRole  @default(STANDARD)
+  isActive          Boolean   @default(true) @map("is_active")
+  lastLogin         DateTime? @map("last_login")
+  passwordChangedAt DateTime? @map("password_changed_at")
+  loginAttempts     Int       @default(0) @map("login_attempts")
+  lockedUntil       DateTime? @map("locked_until")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
   
   tasks        Task[]
   timeLogs     TimeLog[]

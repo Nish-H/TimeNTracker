@@ -17,6 +17,10 @@ router.get('/', auth, requireAdmin, async (req: AuthRequest, res) => {
         name: true,
         role: true,
         isActive: true,
+        lastLogin: true,
+        passwordChangedAt: true,
+        loginAttempts: true,
+        lockedUntil: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -183,6 +187,7 @@ router.put('/:id', auth, requireAdmin, async (req: AuthRequest, res): Promise<an
     if (typeof isActive === 'boolean') updateData.isActive = isActive;
     if (password) {
       updateData.passwordHash = await bcrypt.hash(password, 10);
+      updateData.passwordChangedAt = new Date();
     }
 
     const updatedUser = await prisma.user.update({
@@ -264,6 +269,118 @@ router.delete('/:id', auth, requireAdmin, async (req: AuthRequest, res): Promise
     res.json({ message: 'User deleted successfully' });
   } catch (error: any) {
     console.error('Error deleting user:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Unlock user account (admin only)
+router.post('/:id/unlock', auth, requireAdmin, async (req: AuthRequest, res): Promise<any> => {
+  try {
+    const { id } = req.params;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: {
+        loginAttempts: 0,
+        lockedUntil: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+        loginAttempts: true,
+        lockedUntil: true,
+      }
+    });
+
+    res.json({ message: 'User account unlocked successfully', user: updatedUser });
+  } catch (error: any) {
+    console.error('Error unlocking user:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Reset user password (admin only)
+router.post('/:id/reset-password', auth, requireAdmin, async (req: AuthRequest, res): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: {
+        passwordHash,
+        passwordChangedAt: new Date(),
+        loginAttempts: 0,
+        lockedUntil: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        passwordChangedAt: true,
+      }
+    });
+
+    res.json({ message: 'Password reset successfully', user: updatedUser });
+  } catch (error: any) {
+    console.error('Error resetting password:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Toggle user active status (admin only)
+router.post('/:id/toggle-status', auth, requireAdmin, async (req: AuthRequest, res): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id);
+
+    // Prevent changing own status
+    if (userId === req.user!.id) {
+      return res.status(400).json({ error: 'Cannot change your own account status' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { isActive: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: !user.isActive },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        isActive: true,
+        updatedAt: true,
+      }
+    });
+
+    const action = updatedUser.isActive ? 'activated' : 'deactivated';
+    res.json({ message: `User ${action} successfully`, user: updatedUser });
+  } catch (error: any) {
+    console.error('Error toggling user status:', error);
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'User not found' });
     }

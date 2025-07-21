@@ -283,26 +283,62 @@ router.post('/manual', async (req: AuthRequest, res, next) => {
       (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)
     );
 
-    const timeLog = await prisma.timeLog.create({
-      data: {
-        taskId,
-        userId,
-        startTime: startDateTime,
-        endTime: endDateTime,
-        durationMinutes,
-        description,
-      },
-      include: {
-        task: {
-          select: {
-            id: true,
-            title: true,
-            haloTicketId: true,
-            client: { select: { id: true, name: true } },
-            category: { select: { id: true, name: true, color: true } },
+    // Use transaction with proper error handling for database-level constraint violations
+    const timeLog = await prisma.$transaction(async (tx) => {
+      // Double-check for overlaps within the transaction
+      const recentOverlappingEntries = await tx.timeLog.findMany({
+        where: {
+          userId,
+          OR: [
+            {
+              startTime: {
+                lt: endDateTime,
+              },
+              endTime: {
+                gt: startDateTime,
+              },
+            },
+            {
+              startTime: {
+                gte: startDateTime,
+                lt: endDateTime,
+              },
+            },
+            {
+              endTime: {
+                gt: startDateTime,
+                lte: endDateTime,
+              },
+            },
+          ],
+        },
+      });
+
+      if (recentOverlappingEntries.length > 0) {
+        throw new Error('Time entry overlaps with existing entries (detected in transaction)');
+      }
+
+      return await tx.timeLog.create({
+        data: {
+          taskId,
+          userId,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          durationMinutes,
+          description,
+        },
+        include: {
+          task: {
+            select: {
+              id: true,
+              title: true,
+              haloTicketId: true,
+              client: { select: { id: true, name: true } },
+              category: { select: { id: true, name: true, color: true } },
+            },
           },
         },
-      },
+      });
     });
 
     res.status(201).json({ timeLog });

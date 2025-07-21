@@ -41,10 +41,41 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(401).json({ error: 'Account is disabled' });
+    }
+
+    // Check if account is locked
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      return res.status(401).json({ error: 'Account is temporarily locked. Please try again later.' });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      // Increment failed login attempts
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          loginAttempts: user.loginAttempts + 1,
+          lockedUntil: user.loginAttempts >= 4 
+            ? new Date(Date.now() + 15 * 60 * 1000) // Lock for 15 minutes after 5 failed attempts
+            : null
+        }
+      });
+
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    // Reset login attempts and update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        loginAttempts: 0,
+        lockedUntil: null,
+        lastLogin: new Date(),
+      }
+    });
 
     const token = jwt.sign(
       { userId: user.id },
@@ -58,6 +89,7 @@ router.post('/login', async (req, res, next) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -195,7 +227,10 @@ router.put('/password', authenticateToken, async (req: any, res, next) => {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { passwordHash: newPasswordHash },
+      data: { 
+        passwordHash: newPasswordHash,
+        passwordChangedAt: new Date(),
+      },
     });
 
     return res.json({ message: 'Password updated successfully' });
