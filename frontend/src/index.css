@@ -1,0 +1,236 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 hover:shadow-lg;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-primary text-white hover:shadow-glow focus:ring-primary-500 relative overflow-hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+  
+  .btn-secondary {
+    @apply bg-glass text-white border border-secondary-300 hover:bg-secondary-600 hover:text-white focus:ring-secondary-500;
+  }
+  
+  .btn-success {
+    @apply bg-gradient-success text-white hover:shadow-success-glow focus:ring-success-500 relative overflow-hidden;
+  }
+  
+  .btn-success::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-success:hover::before {
+    left: 100%;
+  }
+  
+  .btn-danger {
+    @apply bg-gradient-danger text-white hover:shadow-danger-glow focus:ring-danger-500 relative overflow-hidden;
+  }
+  
+  .btn-danger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-danger:hover::before {
+    left: 100%;
+  }
+
+  .btn-warning {
+    @apply bg-gradient-warning text-white hover:shadow-lg focus:ring-warning-500 relative overflow-hidden;
+  }
+  
+  .btn-warning::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-warning:hover::before {
+    left: 100%;
+  }
+  
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+  
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+  
+  .btn-xl {
+    @apply px-12 py-6 text-xl;
+  }
+  
+  .form-input, select.form-input, textarea.form-input {
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
+  }
+  
+  .form-label {
+    @apply block text-sm font-bold text-white mb-2;
+  }
+  
+  .card {
+    @apply bg-glass rounded-2xl shadow-glow border border-secondary-300 overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-glow-lg hover:transform hover:scale-105;
+  }
+  
+  .card-header {
+    @apply px-6 py-4 border-b border-secondary-300 bg-gradient-primary text-white;
+  }
+  
+  .card-body {
+    @apply px-6 py-6 text-black font-medium;
+  }
+  
+  .timer-display {
+    @apply font-mono text-7xl font-bold text-cyan-400 animate-pulse-slow;
+    text-shadow: 0 0 10px #22d3ee, 0 0 20px #22d3ee, 0 0 30px #22d3ee;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg;
+  }
+  
+  .status-pending {
+    @apply bg-gradient-warning text-white shadow-lg;
+  }
+  
+  .status-in-progress {
+    @apply bg-gradient-primary text-white shadow-glow animate-pulse-slow;
+  }
+  
+  .status-completed {
+    @apply bg-gradient-success text-white shadow-success-glow;
+  }
+  
+  .status-cancelled {
+    @apply bg-gradient-danger text-white shadow-danger-glow;
+  }
+  
+  .priority-low {
+    @apply bg-glass text-secondary-300 border border-secondary-400;
+  }
+  
+  .priority-medium {
+    @apply bg-gradient-warning text-white shadow-lg;
+  }
+  
+  .priority-high {
+    @apply bg-gradient-electric text-white shadow-electric;
+  }
+  
+  .priority-urgent {
+    @apply bg-gradient-danger text-white shadow-danger-glow animate-pulse-slow;
+  }
+  
+  /* Special effect classes */
+  .neon-glow {
+    @apply animate-glow;
+  }
+  
+  .floating {
+    @apply animate-float;
+  }
+  
+  .gradient-text {
+    @apply text-gradient-primary;
+  }
+  
+  .hero-title {
+    @apply text-4xl md:text-6xl font-bold text-gradient-primary animate-float;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-gradient-primary;
+  }
+  
+  .glass-panel {
+    @apply bg-glass backdrop-blur-lg rounded-2xl border border-secondary-300 shadow-glow;
+  }
+  
+  .stats-card {
+    @apply glass-panel p-6 hover:shadow-glow-lg transition-all duration-300 hover:scale-105;
+  }
+  
+  .timer-card {
+    @apply glass-panel p-8 text-center hover:shadow-glow-lg transition-all duration-300;
+  }
+  
+  .task-item {
+    @apply glass-panel p-4 hover:shadow-glow-lg transition-all duration-300 hover:scale-102;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .border-gradient {
+    border-image: linear-gradient(45deg, #6366f1, #3b82f6, #06b6d4) 1;
+  }
+  
+  .scale-102 {
+    transform: scale(1.02);
+  }
+  
+  .backdrop-blur-xs {
+    backdrop-filter: blur(2px);
+  }
+}
