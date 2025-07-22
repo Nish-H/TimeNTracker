@@ -106,6 +106,10 @@ export const usersApi = {
   update: (id: number, data: { name?: string; email?: string; role?: string; isActive?: boolean; password?: string }) =>
     api.put<User>(`/users/${id}`, data),
   delete: (id: number) => api.delete(`/users/${id}`),
+  unlock: (id: number) => api.post(`/users/${id}/unlock`),
+  resetPassword: (id: number, newPassword: string) => 
+    api.post(`/users/${id}/reset-password`, { newPassword }),
+  toggleStatus: (id: number) => api.post(`/users/${id}/toggle-status`),
 };
 
 // Reports API

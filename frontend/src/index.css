@@ -102,6 +102,10 @@
     left: 100%;
   }
   
+  .btn-xs {
+    @apply px-2 py-1 text-xs;
+  }
+
   .btn-sm {
     @apply px-4 py-2 text-sm;
   }
@@ -113,21 +117,25 @@
   .btn-xl {
     @apply px-12 py-6 text-xl;
   }
+
+  .btn-info {
+    @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:shadow-lg focus:ring-blue-500 relative overflow-hidden;
+  }
   
   .form-input, select.form-input, textarea.form-input {
-    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-secondary-900 font-semibold placeholder-secondary-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
   }
   
   .form-select {
-    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-secondary-900 font-semibold shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow;
   }
   
   .form-textarea {
-    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-black font-semibold placeholder-gray-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow resize-vertical;
+    @apply block w-full rounded-xl border-2 border-secondary-300 bg-white text-secondary-900 font-semibold placeholder-secondary-400 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-all duration-300 focus:shadow-glow resize-y;
   }
   
   .form-label {
-    @apply block text-sm font-bold text-white mb-2;
+    @apply block text-sm font-bold text-white mb-2 drop-shadow-lg;
   }
   
   .card {
@@ -139,7 +147,7 @@
   }
   
   .card-body {
-    @apply px-6 py-6 text-white font-medium;
+    @apply px-6 py-6 text-white font-medium drop-shadow-lg;
   }
   
   .timer-display {
@@ -168,7 +176,7 @@
   }
   
   .priority-low {
-    @apply bg-glass text-secondary-300 border border-secondary-400;
+    @apply bg-secondary-100 text-secondary-700 border border-secondary-400;
   }
   
   .priority-medium {

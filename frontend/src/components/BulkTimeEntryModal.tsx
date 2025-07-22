@@ -83,6 +83,32 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
     return Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100; // Round to 2 decimal places
   };
 
+  const checkForInternalOverlaps = (entries: TimeEntry[]): string[] => {
+    const overlaps: string[] = [];
+    
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        const entry1 = entries[i];
+        const entry2 = entries[j];
+        
+        // Skip if different dates
+        if (entry1.date !== entry2.date) continue;
+        
+        const start1 = new Date(`${entry1.date}T${entry1.startTime}:00`);
+        const end1 = new Date(`${entry1.date}T${entry1.endTime}:00`);
+        const start2 = new Date(`${entry2.date}T${entry2.startTime}:00`);
+        const end2 = new Date(`${entry2.date}T${entry2.endTime}:00`);
+        
+        // Check for overlap: start1 < end2 && start2 < end1
+        if (start1 < end2 && start2 < end1) {
+          overlaps.push(`Entries ${i + 1} and ${j + 1} overlap on ${entry1.date} (${entry1.startTime}-${entry1.endTime} vs ${entry2.startTime}-${entry2.endTime})`);
+        }
+      }
+    }
+    
+    return overlaps;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -107,36 +133,80 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
       return;
     }
 
+    // Check for overlaps between entries in this batch
+    const internalOverlaps = checkForInternalOverlaps(timeEntries);
+    if (internalOverlaps.length > 0) {
+      toast.error(`Found overlaps between entries:\n${internalOverlaps.slice(0, 2).join('\n')}${internalOverlaps.length > 2 ? `\n...and ${internalOverlaps.length - 2} more` : ''}`, {
+        duration: 8000
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       
-      // Create time entries for each day
-      const promises = timeEntries.map(entry => {
-        const startDateTime = new Date(`${entry.date}T${entry.startTime}:00`);
-        const endDateTime = new Date(`${entry.date}T${entry.endTime}:00`);
-        const hours = calculateHours(entry.startTime, entry.endTime);
-
-        return timeLogsApi.createManual({
-          taskId: parseInt(selectedTaskId),
-          startTime: startDateTime.toISOString(),
-          endTime: endDateTime.toISOString(),
-          description: entry.description || `Bulk entry - ${hours} hours`
-        });
-      });
-
-      await Promise.all(promises);
+      // Create time entries sequentially to prevent race conditions and overlaps
+      const results = [];
+      const errors = [];
       
-      toast.success(`Successfully created ${timeEntries.length} time entries`);
-      onSuccess();
-      onClose();
-    } catch (error: any) {
-      console.error('Failed to create bulk time entries:', error);
-      
-      if (error.response?.data?.error?.includes('overlap')) {
-        toast.error('Some entries overlap with existing time logs. Please check and adjust.');
-      } else {
-        toast.error('Failed to create some time entries. Please check for conflicts.');
+      for (let i = 0; i < timeEntries.length; i++) {
+        const entry = timeEntries[i];
+        try {
+          const startDateTime = new Date(`${entry.date}T${entry.startTime}:00`);
+          const endDateTime = new Date(`${entry.date}T${entry.endTime}:00`);
+          const hours = calculateHours(entry.startTime, entry.endTime);
+
+          const result = await timeLogsApi.createManual({
+            taskId: parseInt(selectedTaskId),
+            startTime: startDateTime.toISOString(),
+            endTime: endDateTime.toISOString(),
+            description: entry.description || `Bulk entry - ${hours} hours`
+          });
+          
+          results.push(result);
+        } catch (error: any) {
+          console.error(`Failed to create entry ${i + 1}:`, error);
+          errors.push({
+            index: i + 1,
+            date: entry.date,
+            startTime: entry.startTime,
+            endTime: entry.endTime,
+            error: error.response?.data?.error || error.message
+          });
+        }
       }
+      
+      // Handle results and errors
+      if (errors.length === 0) {
+        toast.success(`Successfully created ${results.length} time entries`);
+        onSuccess();
+        onClose();
+      } else if (results.length > 0 && errors.length > 0) {
+        // Partial success
+        toast.success(`Created ${results.length} entries successfully`);
+        
+        // Show detailed error information
+        const errorMessages = errors.map(e => 
+          `Entry ${e.index} (${e.date} ${e.startTime}-${e.endTime}): ${e.error}`
+        );
+        
+        toast.error(`${errors.length} entries failed:\n${errorMessages.slice(0, 3).join('\n')}${errors.length > 3 ? `\n...and ${errors.length - 3} more` : ''}`, {
+          duration: 8000
+        });
+        
+        // Keep modal open so user can fix the failed entries
+      } else {
+        // All failed
+        const errorMessages = errors.map(e => 
+          `Entry ${e.index}: ${e.error}`
+        );
+        toast.error(`All entries failed:\n${errorMessages.slice(0, 2).join('\n')}${errors.length > 2 ? `\n...and ${errors.length - 2} more` : ''}`, {
+          duration: 8000
+        });
+      }
+    } catch (error: any) {
+      console.error('Unexpected error in bulk time entry:', error);
+      toast.error('Unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -210,7 +280,7 @@ const BulkTimeEntryModal: React.FC<BulkTimeEntryModalProps> = ({
 
             {/* Time Entries */}
             <div className="space-y-3">
-              {timeEntries.map((entry, index) => (
+              {timeEntries.map((entry) => (
                 <div key={entry.id} className="p-4 bg-gray-50 rounded-lg border">
                   <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                     {/* Date */}

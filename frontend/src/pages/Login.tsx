@@ -25,13 +25,16 @@ const Login: React.FC = () => {
       if (isLogin) {
         await login(formData.email, formData.password);
         toast.success('Login successful!');
+        // Don't set loading to false here - let the redirect happen
+        return;
       } else {
         await register(formData.name, formData.email, formData.password);
         toast.success('Registration successful!');
+        // Don't set loading to false here - let the redirect happen
+        return;
       }
     } catch (error: any) {
       toast.error(error.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -143,18 +146,6 @@ const Login: React.FC = () => {
           </div>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="glass-panel p-6 neon-glow">
-          <h3 className="text-sm font-bold text-electric-400 mb-3 text-center">🔑 Demo Credentials:</h3>
-          <div className="text-center space-y-2">
-            <p className="text-sm text-secondary-200 font-mono">
-              Email: <span className="text-accent-400">admin@tasktracker.com</span>
-            </p>
-            <p className="text-sm text-secondary-200 font-mono">
-              Password: <span className="text-accent-400">admin123</span>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

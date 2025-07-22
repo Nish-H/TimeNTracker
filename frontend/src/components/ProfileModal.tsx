@@ -179,10 +179,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, user }) =>
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-white font-bold">Edit Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-900 font-bold">Edit Profile</h2>
           <button
             onClick={onClose}
-            className="text-white hover:text-gray-700 transition-colors"
+            className="text-gray-600 hover:text-gray-800 transition-colors"
           >
             <FaTimes size={20} />
           </button>

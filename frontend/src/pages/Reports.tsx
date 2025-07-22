@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaDownload, FaCalendarAlt, FaChartBar, FaFileExport, FaFilter } from 'react-icons/fa';
-import { DailyReport, HaloExportEntry, TimeLog, Client, Category } from '@/types';
+import { DailyReport, HaloExportEntry, Client, Category } from '@/types';
 import { reportsApi, clientsApi, categoriesApi } from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -214,10 +214,10 @@ const Reports: React.FC = () => {
                 <div className="space-y-2">
                   {Object.entries(dailyReport.byCategory).map(([category, data]) => (
                     <div key={category} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <span className="font-medium">{category}</span>
+                      <span className="font-medium text-black">{category}</span>
                       <div className="text-right">
-                        <div className="font-medium">{data.hours}h</div>
-                        <div className="text-sm text-white">{data.count} entries</div>
+                        <div className="font-medium text-black">{data.hours}h</div>
+                        <div className="text-sm text-gray-600">{data.count} entries</div>
                       </div>
                     </div>
                   ))}
@@ -230,10 +230,10 @@ const Reports: React.FC = () => {
                 <div className="space-y-2">
                   {Object.entries(dailyReport.byClient).map(([client, data]) => (
                     <div key={client} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <span className="font-medium">{client}</span>
+                      <span className="font-medium text-black">{client}</span>
                       <div className="text-right">
-                        <div className="font-medium">{data.hours}h</div>
-                        <div className="text-sm text-white">{data.count} entries</div>
+                        <div className="font-medium text-black">{data.hours}h</div>
+                        <div className="text-sm text-gray-600">{data.count} entries</div>
                       </div>
                     </div>
                   ))}
@@ -247,14 +247,14 @@ const Reports: React.FC = () => {
                   {Object.entries(dailyReport.byTask).map(([task, data]) => (
                     <div key={task} className="flex justify-between items-center p-3 bg-gray-50 rounded">
                       <div>
-                        <div className="font-medium">{task}</div>
+                        <div className="font-medium text-black">{task}</div>
                         {data.haloTicketId && (
                           <div className="text-sm text-blue-600">Halo: {data.haloTicketId}</div>
                         )}
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">{data.hours}h</div>
-                        <div className="text-sm text-white">{data.count} entries</div>
+                        <div className="font-medium text-black">{data.hours}h</div>
+                        <div className="text-sm text-gray-600">{data.count} entries</div>
                       </div>
                     </div>
                   ))}
@@ -389,25 +389,25 @@ const Reports: React.FC = () => {
                       <table className="min-w-full border border-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Date</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Hours</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Entries</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">Tasks</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Hours</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Entries</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Tasks</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {Object.entries(rangeReport.dailyBreakdown).map(([date, data]: [string, any]) => (
                             <tr key={date}>
-                              <td className="px-4 py-2 text-sm text-white font-medium">
+                              <td className="px-4 py-2 text-sm text-gray-900 font-medium">
                                 {new Date(date).toLocaleDateString()}
                               </td>
-                              <td className="px-4 py-2 text-sm text-white">
+                              <td className="px-4 py-2 text-sm text-gray-900">
                                 {data.hours}h
                               </td>
-                              <td className="px-4 py-2 text-sm text-white">
+                              <td className="px-4 py-2 text-sm text-gray-900">
                                 {data.entries}
                               </td>
-                              <td className="px-4 py-2 text-sm text-white">
+                              <td className="px-4 py-2 text-sm text-gray-900">
                                 {data.tasks}
                               </td>
                             </tr>
@@ -425,10 +425,10 @@ const Reports: React.FC = () => {
                     <div className="space-y-2">
                       {Object.entries(rangeReport.byClient).map(([client, data]: [string, any]) => (
                         <div key={client} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                          <span className="font-medium">{client}</span>
+                          <span className="font-medium text-black">{client}</span>
                           <div className="text-right">
-                            <div className="font-medium">{data.hours}h</div>
-                            <div className="text-sm text-gray-300">{data.entries} entries</div>
+                            <div className="font-medium text-black">{data.hours}h</div>
+                            <div className="text-sm text-gray-600">{data.entries} entries</div>
                           </div>
                         </div>
                       ))}
@@ -443,10 +443,10 @@ const Reports: React.FC = () => {
                     <div className="space-y-2">
                       {Object.entries(rangeReport.byCategory).map(([category, data]: [string, any]) => (
                         <div key={category} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                          <span className="font-medium">{category}</span>
+                          <span className="font-medium text-black">{category}</span>
                           <div className="text-right">
-                            <div className="font-medium">{data.hours}h</div>
-                            <div className="text-sm text-gray-300">{data.entries} entries</div>
+                            <div className="font-medium text-black">{data.hours}h</div>
+                            <div className="text-sm text-gray-600">{data.entries} entries</div>
                           </div>
                         </div>
                       ))}
@@ -520,19 +520,19 @@ const Reports: React.FC = () => {
                   <table className="min-w-full border border-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                           Ticket ID
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                           Task
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                           Client
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                           Date
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-white uppercase">
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                           Duration
                         </th>
                       </tr>
@@ -540,19 +540,19 @@ const Reports: React.FC = () => {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {haloExport.slice(0, 10).map((entry, index) => (
                         <tr key={index}>
-                          <td className="px-4 py-2 text-sm text-white">
+                          <td className="px-4 py-2 text-sm text-gray-900">
                             {entry.ticket_id || 'N/A'}
                           </td>
-                          <td className="px-4 py-2 text-sm text-white">
+                          <td className="px-4 py-2 text-sm text-gray-900">
                             {entry.task_title}
                           </td>
-                          <td className="px-4 py-2 text-sm text-white">
+                          <td className="px-4 py-2 text-sm text-gray-900">
                             {entry.client}
                           </td>
-                          <td className="px-4 py-2 text-sm text-white">
+                          <td className="px-4 py-2 text-sm text-gray-900">
                             {entry.date}
                           </td>
-                          <td className="px-4 py-2 text-sm text-white">
+                          <td className="px-4 py-2 text-sm text-gray-900">
                             {entry.duration_hours}h
                           </td>
                         </tr>
@@ -560,7 +560,7 @@ const Reports: React.FC = () => {
                     </tbody>
                   </table>
                   {haloExport.length > 10 && (
-                    <div className="px-4 py-2 text-sm text-white text-center">
+                    <div className="px-4 py-2 text-sm text-gray-600 text-center">
                       ... and {haloExport.length - 10} more entries
                     </div>
                   )}
@@ -569,6 +569,7 @@ const Reports: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
       )}
     </div>
   );

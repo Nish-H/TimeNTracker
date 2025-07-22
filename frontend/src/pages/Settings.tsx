@@ -346,9 +346,9 @@ const Settings: React.FC = () => {
                 clients.map((client) => (
                   <div key={client.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
                     <div>
-                      <div className="font-medium">{client.name}</div>
+                      <div className="font-medium text-black">{client.name}</div>
                       {client.description && (
-                        <div className="text-sm text-white font-semibold">{client.description}</div>
+                        <div className="text-sm text-gray-600 font-semibold">{client.description}</div>
                       )}
                     </div>
                     <div className="flex gap-2">
@@ -404,7 +404,7 @@ const Settings: React.FC = () => {
                         className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: category.color }}
                       ></div>
-                      <span className="font-medium">{category.name}</span>
+                      <span className="font-medium text-black">{category.name}</span>
                     </div>
                     <div className="flex gap-2">
                       <button

@@ -4,6 +4,10 @@ export interface User {
   email: string;
   role?: 'STANDARD' | 'POWER' | 'ADMIN';
   isActive?: boolean;
+  lastLogin?: string | null;
+  passwordChangedAt?: string | null;
+  loginAttempts?: number;
+  lockedUntil?: string | null;
   createdAt?: string;
   updatedAt?: string;
   _count?: {

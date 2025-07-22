@@ -164,6 +164,14 @@ export default {
           'backdrop-filter': 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
         },
+        '.text-contrast-light': {
+          color: '#ffffff',
+          'text-shadow': '0 1px 3px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.5)',
+        },
+        '.text-contrast-dark': {
+          color: '#1e293b',
+          'text-shadow': '0 1px 3px rgba(255, 255, 255, 0.8), 0 0 5px rgba(255, 255, 255, 0.3)',
+        },
       }
       addUtilities(newUtilities)
     }
