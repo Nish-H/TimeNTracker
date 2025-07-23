@@ -114,12 +114,12 @@ export const usersApi = {
 
 // Reports API
 export const reportsApi = {
-  getDaily: (date?: string) => api.get<{ summary: DailyReport; timeLogs: TimeLog[] }>('/reports/daily', { params: { date } }),
-  getWeekly: (startDate?: string) => api.get('/reports/weekly', { params: { startDate } }),
-  getRange: (startDate: string, endDate: string, clientId?: number, categoryId?: number) =>
-    api.get('/reports/range', { params: { startDate, endDate, clientId, categoryId } }),
-  getHaloExport: (startDate: string, endDate: string) =>
-    api.get<{ export: HaloExportEntry[]; summary: any }>('/reports/halo-export', { params: { startDate, endDate } }),
+  getDaily: (date?: string, userId?: number) => api.get<{ summary: DailyReport; timeLogs: TimeLog[] }>('/reports/daily', { params: { date, userId } }),
+  getWeekly: (startDate?: string, userId?: number) => api.get('/reports/weekly', { params: { startDate, userId } }),
+  getRange: (startDate: string, endDate: string, clientId?: number, categoryId?: number, userId?: number) =>
+    api.get('/reports/range', { params: { startDate, endDate, clientId, categoryId, userId } }),
+  getHaloExport: (startDate: string, endDate: string, userId?: number) =>
+    api.get<{ export: HaloExportEntry[]; summary: any }>('/reports/halo-export', { params: { startDate, endDate, userId } }),
 };
 
 // Backup API

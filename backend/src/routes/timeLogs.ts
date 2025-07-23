@@ -33,8 +33,10 @@ const createTimeLogSchema = z.object({
 // Get all time logs
 router.get('/', async (req: AuthRequest, res, next) => {
   try {
-    const { taskId, date, active } = req.query;
-    const userId = req.user!.id;
+    const { taskId, date, active, userId: queryUserId } = req.query;
+    const currentUser = req.user!;
+    // Allow admins to view other users' time logs, otherwise use current user
+    const userId = (currentUser.role === 'admin' && queryUserId) ? parseInt(queryUserId as string) : currentUser.id;
 
     const where: any = { userId };
     

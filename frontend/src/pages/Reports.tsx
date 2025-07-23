@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FaDownload, FaCalendarAlt, FaChartBar, FaFileExport, FaFilter } from 'react-icons/fa';
-import { DailyReport, HaloExportEntry, Client, Category } from '@/types';
-import { reportsApi, clientsApi, categoriesApi } from '@/services/api';
+import { FaDownload, FaCalendarAlt, FaChartBar, FaFileExport, FaFilter, FaUser } from 'react-icons/fa';
+import { DailyReport, HaloExportEntry, Client, Category, User } from '@/types';
+import { reportsApi, clientsApi, categoriesApi, usersApi } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const Reports: React.FC = () => {
+  const { user } = useAuth();
   const [dailyReport, setDailyReport] = useState<DailyReport | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [dateRange, setDateRange] = useState({
@@ -15,12 +17,16 @@ const Reports: React.FC = () => {
   const [rangeReport, setRangeReport] = useState<any>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [filters, setFilters] = useState({
     clientId: '',
-    categoryId: ''
+    categoryId: '',
+    userId: ''
   });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'daily' | 'range' | 'export'>('daily');
+
+  const isAdmin = user?.role === 'ADMIN';
 
   useEffect(() => {
     loadDailyReport();
@@ -29,12 +35,23 @@ const Reports: React.FC = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const [clientsResponse, categoriesResponse] = await Promise.all([
+      const promises = [
         clientsApi.getAll(),
         categoriesApi.getAll()
-      ]);
-      setClients(clientsResponse.data.clients);
-      setCategories(categoriesResponse.data.categories);
+      ];
+      
+      // Only load users if admin
+      if (isAdmin) {
+        promises.push(usersApi.getAll());
+      }
+      
+      const responses = await Promise.all(promises);
+      setClients(responses[0].data.clients);
+      setCategories(responses[1].data.categories);
+      
+      if (isAdmin && responses[2]) {
+        setUsers(responses[2].data);
+      }
     } catch (error) {
       console.error('Failed to load filter options:', error);
     }
@@ -43,7 +60,8 @@ const Reports: React.FC = () => {
   const loadDailyReport = async () => {
     try {
       setLoading(true);
-      const response = await reportsApi.getDaily(selectedDate);
+      const userId = filters.userId ? parseInt(filters.userId) : undefined;
+      const response = await reportsApi.getDaily(selectedDate, userId);
       setDailyReport(response.data.summary);
     } catch (error) {
       console.error('Failed to load daily report:', error);
@@ -58,8 +76,9 @@ const Reports: React.FC = () => {
       setLoading(true);
       const clientId = filters.clientId ? parseInt(filters.clientId) : undefined;
       const categoryId = filters.categoryId ? parseInt(filters.categoryId) : undefined;
+      const userId = filters.userId ? parseInt(filters.userId) : undefined;
       
-      const response = await reportsApi.getRange(dateRange.start, dateRange.end, clientId, categoryId);
+      const response = await reportsApi.getRange(dateRange.start, dateRange.end, clientId, categoryId, userId);
       setRangeReport(response.data);
       toast.success('Range report generated successfully');
     } catch (error) {
@@ -73,7 +92,8 @@ const Reports: React.FC = () => {
   const generateHaloExport = async () => {
     try {
       setLoading(true);
-      const response = await reportsApi.getHaloExport(dateRange.start, dateRange.end);
+      const userId = filters.userId ? parseInt(filters.userId) : undefined;
+      const response = await reportsApi.getHaloExport(dateRange.start, dateRange.end, userId);
       setHaloExport(response.data.export);
       toast.success('Halo export generated successfully');
     } catch (error) {
@@ -167,14 +187,40 @@ const Reports: React.FC = () => {
               <FaChartBar className="text-white" />
               Daily Report
             </h3>
-            <div className="flex items-center gap-2">
-              <FaCalendarAlt className="text-white" />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="form-input"
-              />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <FaCalendarAlt className="text-white" />
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="form-input"
+                />
+              </div>
+              {isAdmin && (
+                <div className="flex items-center gap-2">
+                  <FaUser className="text-white" />
+                  <select
+                    value={filters.userId}
+                    onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                    className="form-select"
+                  >
+                    <option value="">All Engineers</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={loadDailyReport}
+                    className="btn btn-sm btn-primary flex items-center gap-1"
+                  >
+                    <FaFilter />
+                    Apply
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -282,7 +328,7 @@ const Reports: React.FC = () => {
           <div className="card-body">
             {/* Date Range and Filter Controls */}
             <div className="space-y-4 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                   <label className="form-label">Start Date</label>
                   <input
@@ -301,6 +347,23 @@ const Reports: React.FC = () => {
                     className="form-input"
                   />
                 </div>
+                {isAdmin && (
+                  <div>
+                    <label className="form-label">Engineer Filter</label>
+                    <select
+                      value={filters.userId}
+                      onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                      className="form-select"
+                    >
+                      <option value="">All Engineers</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div>
                   <label className="form-label">Client Filter</label>
                   <select
@@ -470,7 +533,7 @@ const Reports: React.FC = () => {
         </div>
         <div className="card-body">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="form-label">Start Date</label>
                 <input
@@ -489,6 +552,23 @@ const Reports: React.FC = () => {
                   className="form-input"
                 />
               </div>
+              {isAdmin && (
+                <div>
+                  <label className="form-label">Engineer Filter</label>
+                  <select
+                    value={filters.userId}
+                    onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                    className="form-select"
+                  >
+                    <option value="">All Engineers</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4">

@@ -17,8 +17,10 @@ const reportQuerySchema = z.object({
 // Get daily activity report
 router.get('/daily', async (req: AuthRequest, res, next) => {
   try {
-    const { date } = req.query;
-    const userId = req.user!.id;
+    const { date, userId: queryUserId } = req.query;
+    const currentUser = req.user!;
+    // Allow admins to view other users' reports, otherwise use current user
+    const userId = (currentUser.role === 'admin' && queryUserId) ? parseInt(queryUserId as string) : currentUser.id;
     const reportDate = date ? new Date(date as string) : new Date();
 
     const startDate = startOfDay(reportDate);
@@ -173,8 +175,10 @@ router.get('/weekly', async (req: AuthRequest, res, next) => {
 // Get custom range report
 router.get('/range', async (req: AuthRequest, res, next) => {
   try {
-    const { startDate, endDate, clientId, categoryId } = reportQuerySchema.parse(req.query);
-    const userId = req.user!.id;
+    const { startDate, endDate, clientId, categoryId, userId: queryUserId } = reportQuerySchema.parse(req.query);
+    const currentUser = req.user!;
+    // Allow admins to view other users' reports, otherwise use current user
+    const userId = (currentUser.role === 'admin' && queryUserId) ? parseInt(queryUserId) : currentUser.id;
 
     const where: any = {
       userId,
@@ -320,8 +324,10 @@ router.get('/range', async (req: AuthRequest, res, next) => {
 // Generate Halo-compatible export
 router.get('/halo-export', async (req: AuthRequest, res, next) => {
   try {
-    const { startDate, endDate } = req.query;
-    const userId = req.user!.id;
+    const { startDate, endDate, userId: queryUserId } = req.query;
+    const currentUser = req.user!;
+    // Allow admins to view other users' reports, otherwise use current user
+    const userId = (currentUser.role === 'admin' && queryUserId) ? parseInt(queryUserId as string) : currentUser.id;
 
     if (!startDate || !endDate) {
       return res.status(400).json({ error: 'Start date and end date are required' });

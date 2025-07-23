@@ -1,29 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { FaClock, FaEdit, FaTrash, FaCalendarAlt, FaPlus, FaBullseye } from 'react-icons/fa';
-import { TimeLog } from '@/types';
-import { timeLogsApi } from '@/services/api';
+import { FaClock, FaEdit, FaTrash, FaCalendarAlt, FaPlus, FaBullseye, FaUser, FaFilter } from 'react-icons/fa';
+import { TimeLog, User } from '@/types';
+import { timeLogsApi, usersApi } from '@/services/api';
 import { useTimer } from '@/hooks/useTimer';
+import { useAuth } from '@/contexts/AuthContext';
 import ManualTimeEntryModal from '@/components/ManualTimeEntryModal';
 import BulkTimeEntryModal from '@/components/BulkTimeEntryModal';
 import toast from 'react-hot-toast';
 
 const TimeLogPage: React.FC = () => {
+  const { user } = useAuth();
   const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [showManualModal, setShowManualModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [editingTimeLog, setEditingTimeLog] = useState<TimeLog | null>(null);
   const { formatTime } = useTimer();
 
+  const isAdmin = user?.role === 'ADMIN';
+
   useEffect(() => {
     loadTimeLogs();
+    if (isAdmin) {
+      loadUsers();
+    }
   }, [selectedDate]);
+
+  const loadUsers = async () => {
+    try {
+      const response = await usersApi.getAll();
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    }
+  };
 
   const loadTimeLogs = async () => {
     try {
       setLoading(true);
-      const response = await timeLogsApi.getAll({ date: selectedDate });
+      const params: any = { date: selectedDate };
+      if (selectedUserId) {
+        params.userId = selectedUserId;
+      }
+      const response = await timeLogsApi.getAll(params);
       setTimeLogs(response.data.timeLogs);
     } catch (error) {
       console.error('Failed to load time logs:', error);
@@ -94,14 +116,40 @@ const TimeLogPage: React.FC = () => {
             <FaBullseye />
             Bulk Time Entry
           </button>
-          <div className="flex items-center gap-2">
-            <FaCalendarAlt className="text-white" />
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="form-input"
-            />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <FaCalendarAlt className="text-white" />
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="form-input"
+              />
+            </div>
+            {isAdmin && (
+              <div className="flex items-center gap-2">
+                <FaUser className="text-white" />
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  className="form-select"
+                >
+                  <option value="">All Engineers</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={loadTimeLogs}
+                  className="btn btn-sm btn-primary flex items-center gap-1"
+                >
+                  <FaFilter />
+                  Apply
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
